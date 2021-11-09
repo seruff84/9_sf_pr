@@ -1,0 +1,13 @@
+---
+# handlers file for 9_sf_dock
+
+- name: restart docker
+  service:
+    name: docker
+    state: restarted
+
+- name: restart postgresql
+  service:
+    name: postgresql
+    state: restarted
+

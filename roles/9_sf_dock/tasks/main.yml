@@ -1,0 +1,6 @@
+---
+# tasks file for 9_sf_dock
+- include: docker.yml
+- include: pg.yml
+- include: app.yml
+- include: container.yml

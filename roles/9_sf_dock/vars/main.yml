@@ -1,0 +1,8 @@
+---
+# vars file for 9_sf_dock
+dst_folder:            ~/
+db_user:               dbuser01
+db_name:               sfdb
+db_password:           sf9pgDBpass
+docker_image_tag:      sfpy
+docker_container_name: sf_py_app

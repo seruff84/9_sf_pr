@@ -1,0 +1,69 @@
+- name: Ensure bash, OpenSSl, and libssl are the latest versions
+  apt:
+    name: "{{ item }}"
+    update_cache: true
+    state: latest
+  loop:
+    - bash
+    - openssl
+    - libssl-dev
+    - libssl-doc
+
+
+- name: Install PostgreSQL
+  apt:
+    name: "{{ item }}"
+    update_cache: true
+    state: present
+  loop:
+    - postgresql
+    - postgresql-contrib
+    - libpq-dev
+    - python3-psycopg2
+
+
+- name: Ensure the PostgreSQL service is running
+  service: name=postgresql state=started enabled=yes
+
+- name: Ensure database is created
+  become_user: postgres
+  become_method: sudo
+  become: true
+  postgresql_db:  name={{ db_name }}
+                  encoding='UTF-8'
+                  lc_collate='en_US.UTF-8'
+                  lc_ctype='en_US.UTF-8'
+                  template='template0'
+                  state=present
+
+- name: Ensure user has access to the database
+  become_user: postgres
+  become: true
+  postgresql_user: db={{ db_name }}
+                   name={{ db_user }}
+                   password={{ db_password }}
+                   priv=ALL
+                   state=present
+
+- name: Ensure user does not have unnecessary privileges
+  become_user: postgres
+  become: true
+  postgresql_user: name={{ db_user }} role_attr_flags=NOSUPERUSER,NOCREATEDB state=present
+
+- name: Ensure the default Postgresql bind address is 0.0.0.0
+  lineinfile:
+    path: /etc/postgresql/12/main/postgresql.conf
+    regexp: '^listen_addresses '
+    insertafter: '^#listen_addresses'
+    line: listen_addresses = '{{ansible_default_ipv4.address}}'
+
+- name: Add Docker subnet to pg_hba
+  ansible.builtin.lineinfile:
+    path: /etc/postgresql/12/main/pg_hba.conf
+    line: "host    all             all             172.17.0.0/16            md5"
+    create: yes
+
+- name: restart postgresql
+  service:
+    name: postgresql
+    state: restarted

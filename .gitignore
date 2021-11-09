@@ -1,0 +1,9 @@
+/venv
+/.terraform
+meta.txt
+terraform.tfvars
+/.idea
+terraform.tfstate*
+.terraform.*
+inventory
+cred.tf

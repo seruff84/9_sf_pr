@@ -1,0 +1,38 @@
+- name: Delete content & directory
+  file:
+    state: absent
+    path: "{{ dst_folder }}/DEVOPS-praktikum_Docker/"
+
+- name: Get app from git
+  ansible.builtin.git:
+    repo: https://github.com/SkillfactoryCoding/DEVOPS-praktikum_Docker.git
+    dest: "{{ dst_folder }}/DEVOPS-praktikum_Docker/"
+
+- name: Configure app
+  lineinfile:
+    dest: "{{ dst_folder }}/DEVOPS-praktikum_Docker/web.conf"
+    regexp: "^{{ item.property | regex_escape() }} = "
+    line: "{{ item.property }} = {{ item.value }}"
+  with_items:
+    - { property: 'db_user', value: "'{{db_user}}'"}
+    - { property: 'db_password', value: "'{{db_password}}'" }
+    - { property: 'db_host', value: "'{{ansible_default_ipv4.address}}'" }
+    - { property: 'db_name', value: "'{{db_name}}'" }
+
+- name: Replace typo in configparser
+  lineinfile:
+    path: "{{ dst_folder }}/DEVOPS-praktikum_Docker/web.py"
+    search_string: 'except configparser.NoSectionError:'
+    line: '        except ConfigParser.NoSectionError:'
+
+- name: Replace newline typo
+  lineinfile:
+    path: "{{ dst_folder }}/DEVOPS-praktikum_Docker/web.py"
+    search_string: "        conn = connect(\"host= {0} dbname={1} user={2} password={3}\".format(get_db_config('db_host'), get_db_config('db_name'), get_db_config('db_user'), get_"
+    line: "        conn = connect(\"host= {0} dbname={1} user={2} password={3}\".format(get_db_config('db_host'), get_db_config('db_name'), get_db_config('db_user'), get_db_config('db_password')))"
+
+- name: Replace newline typo 2
+  lineinfile:
+    path: "{{ dst_folder }}/DEVOPS-praktikum_Docker/web.py"
+    search_string: "db_config('db_password')))"
+    line: ""

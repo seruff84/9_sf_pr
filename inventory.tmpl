@@ -1,0 +1,4 @@
+[ya-vm]
+%{ for index, host in hostname ~}
+${host} ansible_host=${ address_vm[index] }
+%{ endfor ~}

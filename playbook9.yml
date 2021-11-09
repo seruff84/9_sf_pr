@@ -1,0 +1,7 @@
+---
+  - name: SkillFactory Project9
+    hosts: all
+    become: yes
+
+    roles:
+      - 9_sf_dock

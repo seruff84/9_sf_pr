@@ -1,0 +1,15 @@
+- name: build container image
+  community.docker.docker_image:
+    name: "{{docker_image_tag}}"
+    build:
+      path: "{{ dst_folder }}"
+    source: build
+    state: present
+
+- name: Container present
+  community.docker.docker_container:
+    name: "{{docker_container_name}}"
+    state: started
+    image: "{{docker_image_tag}}"
+    ports:
+      - "80:5000"
